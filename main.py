@@ -3,7 +3,9 @@
 # https://raw.githubusercontent.com/elisaado/steps-to-python/master/LICENSE
 
 from glob import glob
+from re import sub
 from flask import Flask
+
 app = Flask(__name__)
 # app.run(debug=True)
 
@@ -30,7 +32,10 @@ def guideParser(path):
     else:
       needed.append(needed_raw[1:])
 
+  steps_raw = "".join(content.split("#s")[1:]).split("\n")[1:]
   steps = []
+  for step_raw in steps_raw:
+    steps.append(sub(r'(\d+)\. ', '', step_raw, 1))
 
   return {"name": name, "title": title, "by": by, "needed": needed, "steps": steps}
 
