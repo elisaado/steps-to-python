@@ -2,9 +2,46 @@
 # that license with this software, you can find it here: 
 # https://raw.githubusercontent.com/elisaado/steps-to-python/master/LICENSE
 
+from glob import glob
 from flask import Flask
 app = Flask(__name__)
+# app.run(debug=True)
+
+# My own markup language's parser
+def guideParser(path):
+  with open(path, "r") as f:
+    content = f.read() 
+
+  name = path.split("/")[1:][0]
+  title = content.split("#t")[1].split("\n")[1]
+  by = content.split("#b")[1].split("\n")[1]
+
+  # now comes the real stuff :v
+  needed_raws = "".join(content.split("#n")[1:]).split("\n")
+  needed = []
+
+  for needed_raw in needed_raws[1:]:
+    if len(needed_raw) <= 0:
+      continue
+    elif needed_raw[0] != "*":
+      break
+    elif needed_raw[1] == " ":
+      needed.append(needed_raw[2:])
+    else:
+      needed.append(needed_raw[1:])
+
+  steps = []
+
+  return {"name": name, "title": title, "by": by, "needed": needed, "steps": steps}
+
+guides = []
+guides_paths = glob("guides/*")
+
+for guide_path in guides_paths:
+  guides.append(guideParser(guide_path))
 
 @app.route("/")
-def hello():
-    return "Hello World!"
+def index():
+  return str(guides)
+
+# @app.route("")
